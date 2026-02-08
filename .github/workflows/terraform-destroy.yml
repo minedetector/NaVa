@@ -50,7 +50,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::187833180667:role/github_workflow
+          role-to-assume: arn:aws:iam::187833180667:role/system/github-actions-role
           role-session-name: github_workflow_destroy_${{ github.event.inputs.directory }}
           aws-region: eu-north-1
 
@@ -67,19 +67,3 @@ jobs:
           echo "🔥 Destroying infrastructure for ${{ github.event.inputs.directory }}..."
           terraform destroy -auto-approve -input=false -no-color
         timeout-minutes: 30
-
-      - name: Generate Summary
-        if: always()
-        run: |
-          echo "## 🔥 Terraform Destroy Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ **Successfully destroyed:** \`${{ github.event.inputs.directory }}\`" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ **Destroy failed:** \`${{ github.event.inputs.directory }}\`" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Actor:** \`${{ github.actor }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Timestamp:** \`$(date -u)\`" >> $GITHUB_STEP_SUMMARY

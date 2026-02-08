@@ -1,10 +1,9 @@
 terraform {
   required_version = ">= 1.0"
   backend "s3" {
-    bucket = "larasi-terraform-state"
-    key    = "larasi-lab-state.tfstate"
+    bucket = "nava-terraform-state-for-students"
+    key    = "larasi-beginner-lab-state.tfstate"
     region = "eu-north-1"
-    profile = "nava-admin"
   }
   required_providers {
     aws = {
@@ -15,14 +14,20 @@ terraform {
 }
 
 provider "aws" {
-  profile = "nava-admin"
   region = "eu-north-1"
 }
 
+data "aws_vpc" "this" {
+  id = "vpc-02fb02f6b35b49a55"
+}
+
+data "aws_subnet" "this" {
+  id = "subnet-075cc0f55c52f431e"
+}
 
 resource "aws_security_group" "this" {
   name   = "${var.uni_id}-sg-tf"
-  vpc_id = var.vpc_id
+  vpc_id = data.aws_vpc.this.id
 
   ingress {
     from_port   = 22
@@ -52,19 +57,11 @@ resource "aws_security_group" "this" {
   }
 }
 
-data "template_file" "this" {
-  template = file("init_script.sh")
-
-  vars = {
-    uni_id = var.uni_id
-  }
-}
-
 resource "aws_instance" "web" {
-  ami           = "ami-04175dfed7619fb38"
+  ami           = "ami-04233b5aecce09244"
   instance_type = "t3.micro"
 
-  subnet_id = "subnet-0a4b809ee0eb4b83c"
+  subnet_id = data.aws_subnet.this.id
 
   user_data = base64encode(templatefile("init_script.sh", { uni_id = var.uni_id }))
 
@@ -72,130 +69,8 @@ resource "aws_instance" "web" {
     aws_security_group.this.id
   ]
 
-  key_name = "lars-work-mac"
-
   tags = {
     User = var.uni_id
     Name = "${var.uni_id}-instance-tf"
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#data "template_file" "this" {
-#  template = file("init_script.sh")
-#
-#  vars = {
-#    uni_id = var.uni_id
-#  }
-#}
-#
-#resource "aws_instance" "web" {
-#  ami           = "ami-04175dfed7619fb38"
-#  instance_type = "t3.micro"
-#
-#  subnet_id = "subnet-098b2ee2b4fc6d33c"
-#
-#  vpc_security_group_ids = [
-#    "${aws_security_group.allow_ssh_and_http.id}"
-#  ]
-#
-#  user_data = data.template_file.this.rendered
-#
-#  key_name = "salli-ssh"
-#
-#  tags = {
-#    Name = "${var.uni_id}-tf",
-#    User = "${var.uni_id}"
-#  }
-#}
-#
-#resource "aws_security_group" "allow_ssh_and_http" {
-#  name        = "${var.uni_id}-allow-ssh-and-http"
-#  description = "Allow ssh and http connections"
-#  vpc_id      = "vpc-0864ffadf65555894"
-#
-#  ingress {
-#    description = "Allow http"
-#    from_port   = 80
-#    to_port     = 80
-#    protocol    = "tcp"
-#    cidr_blocks = ["0.0.0.0/0"]
-#  }
-#
-#  ingress {
-#    from_port   = 22
-#    to_port     = 22
-#    protocol    = "tcp"
-#    cidr_blocks = ["0.0.0.0/0"]
-#  }
-#
-#  egress {
-#    from_port   = 0
-#    to_port     = 0
-#    protocol    = "-1"
-#    cidr_blocks = ["0.0.0.0/0"]
-#  }
-#
-#  tags = {
-#    Name = "${var.uni_id}-webserver-tf",
-#    User = "${var.uni_id}"
-#  }
-#}
-#

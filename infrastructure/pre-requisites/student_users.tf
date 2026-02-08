@@ -23,9 +23,9 @@ resource "aws_iam_policy" "students_custom" {
         Resource = "*"
       },
       {
-        Sid    = "DenyNonT3MicroEC2Launch"
-        Effect = "Deny"
-        Action = "ec2:RunInstances"
+        Sid      = "DenyNonT3MicroEC2Launch"
+        Effect   = "Deny"
+        Action   = "ec2:RunInstances"
         Resource = "arn:aws:ec2:eu-north-1:*:instance/*"
         Condition = {
           StringNotEquals = {
@@ -57,9 +57,9 @@ resource "aws_iam_policy" "students_custom" {
         Resource = "*"
       },
       {
-        Sid    = "DenyNonT3MicroRDSCreation"
-        Effect = "Deny"
-        Action = "rds:CreateDBInstance"
+        Sid      = "DenyNonT3MicroRDSCreation"
+        Effect   = "Deny"
+        Action   = "rds:CreateDBInstance"
         Resource = "*"
         Condition = {
           StringNotEquals = {
@@ -250,12 +250,10 @@ resource "null_resource" "create_login_profiles" {
       aws iam create-login-profile \
         --user-name ${aws_iam_user.students[count.index].name} \
         --password '${random_password.student_passwords[count.index].result}' \
-        --profile nava-admin \
         --region eu-north-1 2>/dev/null || \
       aws iam update-login-profile \
         --user-name ${aws_iam_user.students[count.index].name} \
         --password '${random_password.student_passwords[count.index].result}' \
-        --profile nava-admin \
         --region eu-north-1
     EOT
 
