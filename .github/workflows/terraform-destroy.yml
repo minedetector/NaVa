@@ -1,0 +1,85 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      directory:
+        description: 'Directory to destroy'
+        required: true
+        type: choice
+        options:
+          - pre-requisites
+          - beginner-lab
+          - serverless-lab
+      confirm:
+        description: 'Type "DESTROY" to confirm'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  terraform-destroy:
+    name: Destroy (${{ github.event.inputs.directory }})
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./${{ github.event.inputs.directory }}
+
+    steps:
+      - name: Validate Confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "DESTROY" ]; then
+            echo "::error::Confirmation failed. You must type 'DESTROY' exactly."
+            exit 1
+          fi
+          echo "✅ Confirmation validated"
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+          terraform_wrapper: false
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::187833180667:role/github_workflow
+          role-session-name: github_workflow_destroy_${{ github.event.inputs.directory }}
+          aws-region: eu-north-1
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan Destroy
+        run: |
+          echo "📋 Planning destruction of ${{ github.event.inputs.directory }}..."
+          terraform plan -destroy -no-color -input=false
+
+      - name: Terraform Destroy
+        run: |
+          echo "🔥 Destroying infrastructure for ${{ github.event.inputs.directory }}..."
+          terraform destroy -auto-approve -input=false -no-color
+        timeout-minutes: 30
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "## 🔥 Terraform Destroy Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ **Successfully destroyed:** \`${{ github.event.inputs.directory }}\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Destroy failed:** \`${{ github.event.inputs.directory }}\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Actor:** \`${{ github.actor }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timestamp:** \`$(date -u)\`" >> $GITHUB_STEP_SUMMARY
