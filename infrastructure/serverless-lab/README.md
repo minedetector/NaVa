@@ -1,3 +1,7 @@
+Prefix that all of the resources created must have the following tags
+`Name: <team_nr>-<resource_name>`
+`Team: tiim_<nr>`
+
 1. Create security credentials for yourself
     1. Go to IAM
     2. Find your teams user
@@ -8,6 +12,9 @@
     2. Choose all three AZ-s
     3. Choose all `Database` subnet groups
 3. Create a Security Group for your database
+    1. Go to EC2 -> Security Groups
+    2. Create a security group with
+        1. Inbound rule allowing MYSQL port 3306 from `10.0.0.0/16`
 4. Create the RDS cluster
     1. Use the `Full configuration` option
     2. Choose a `MySQL`
@@ -20,18 +27,15 @@
     8. `Don't connect to an EC2 compute resource`
     9. Ensure that the VPC is `NaVa`
     10. Use the already created `database subnet group`
-    11. Use the already created SG `rds-sg`
-    12. Add the mandatory tags
-        1. `Team: tiim`
-        2. `Name: tiimi-rds`
-    13. Scroll down and open `Additional configuration`
+    11. Use the Security Group you created
+    12. Scroll down and open `Additional configuration`
         1. Create an initial database named `wordpress`
 5. After creating the RDS resource go to `Secrets Manager` to confirm that the access was created correctly
     1. Look for a resource named `rds!db-....`
-6. Create parameters
-    1. `/dev/WORDPRESS_DB_HOST` - text
+6. Create parameters in `Parameter Store`
+    1. `/dev/WORDPRESS_DB_HOST_<team_name>` - text
         1. Add the endpoint with the port like `<endpoint>:3306`
-    2. `/dev/WORDPRESS_DB_NAME` - secureString
+    2. `/dev/WORDPRESS_DB_NAME_<team_name>` - secureString
         1. Using the default KMS key because it doesn’t require any extra KMS permissions to use it
         2. The value is `wordpress`
 7. ECR
@@ -68,9 +72,6 @@
             2. WORDPRESS_DB_NAME - Parameter Store
             3. WORDPRESS_DB_USER - Secrets Manager
             4. WORDPRESS_DB_PASSWORD - Secrets Manager
-        7. Add the required `Tags` to the task definition
-            1. `Team: tiimi nimi`
-            2. `Name: <>`
     2. Create the `Cluster`
         1. Use Fargate only
     3. Click on the created service and in the `Service` tab choose `Create service`
