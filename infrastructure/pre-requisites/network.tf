@@ -47,7 +47,7 @@ resource "aws_nat_gateway" "main" {
 resource "aws_subnet" "public" {
   count                   = 3
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.${count.index * 16}.0/20"          # 10.0.0.0/20, 10.0.16.0/20, 10.0.32.0/20
+  cidr_block              = "10.0.${count.index * 16}.0/20" # 10.0.0.0/20, 10.0.16.0/20, 10.0.32.0/20
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = true
 
@@ -59,7 +59,7 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   count             = 3
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.${(count.index + 3) * 16}.0/20"                # 10.0.48.0/20, 10.0.64.0/20, 10.0.80.0/20
+  cidr_block        = "10.0.${(count.index + 3) * 16}.0/20" # 10.0.48.0/20, 10.0.64.0/20, 10.0.80.0/20
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
@@ -70,7 +70,7 @@ resource "aws_subnet" "private" {
 resource "aws_subnet" "database" {
   count             = 3
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.${(count.index + 6) * 16}.0/20"                # 10.0.96.0/20, 10.0.112.0/20, 10.0.128.0/20
+  cidr_block        = "10.0.${(count.index + 6) * 16}.0/20" # 10.0.96.0/20, 10.0.112.0/20, 10.0.128.0/20
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
@@ -82,8 +82,8 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
   route {
-    cidr_block      = "0.0.0.0/0"
-    gateway_id      = aws_internet_gateway.main.id
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
   }
 
   route {

@@ -77,16 +77,16 @@ jobs:
           CHANGED_DIRS=()
 
           # Check each Terraform directory
-          if echo "$CHANGED_FILES" | grep -q '^pre-requisites/'; then
-            CHANGED_DIRS+=("pre-requisites")
+          if echo "$CHANGED_FILES" | grep -q '^infrastructure/pre-requisites/'; then
+            CHANGED_DIRS+=("infrastructure/pre-requisites")
           fi
 
-          if echo "$CHANGED_FILES" | grep -q '^beginner-lab/'; then
-            CHANGED_DIRS+=("beginner-lab")
+          if echo "$CHANGED_FILES" | grep -q '^infrastructure/beginner-lab/'; then
+            CHANGED_DIRS+=("infrastructure/beginner-lab")
           fi
 
-          if echo "$CHANGED_FILES" | grep -q '^serverless-lab/'; then
-            CHANGED_DIRS+=("serverless-lab")
+          if echo "$CHANGED_FILES" | grep -q '^infrastructure/serverless-lab/'; then
+            CHANGED_DIRS+=("infrastructure/serverless-lab")
           fi
 
           # Create JSON matrix

@@ -8,19 +8,19 @@ data "terraform_remote_state" "existing" {
 }
 
 locals {
-  vpc_id                      = "vpc-02fb02f6b35b49a55"
+  vpc_id   = "vpc-02fb02f6b35b49a55"
   vpc_cidr = "10.0.0.0/16"
-  public_subnet_ids           = [
+  public_subnet_ids = [
     "subnet-075cc0f55c52f431e",
     "subnet-0deda9b0ab4690507",
     "subnet-07d8eb94afbed060d"
   ]
-  private_subnet_ids          = [
+  private_subnet_ids = [
     "subnet-0bdfc835013848e8d",
     "subnet-0d9ece4706152d816",
     "subnet-06cf55ea79ac8da5e"
   ]
-  database_subnet_ids         = [
+  database_subnet_ids = [
     "subnet-0e0637e027a086783",
     "subnet-0c622d475dc905bf0",
     "subnet-07c332b0e2897959f"
@@ -82,8 +82,8 @@ resource "aws_db_instance" "wordpress" {
   allocated_storage = 20
   storage_type      = "gp3"
 
-  db_name  = "wordpress"
-  username = "admin"
+  db_name                     = "wordpress"
+  username                    = "admin"
   manage_master_user_password = true
 
   db_subnet_group_name   = aws_db_subnet_group.database.name
