@@ -39,7 +39,7 @@ Prefix that all of the resources created must have the following tags
         1. Using the default KMS key because it doesn’t require any extra KMS permissions to use it
         2. The value is `wordpress`
 7. ECR
-    1. Create a private repo `wordpress`
+    1. Create a private repo `<team_name>/wordpress`
         1. Pull the latest wordpress image
             1. `docker pull --platform linux/amd64 wordpress:latest`
         2. Inside the created repo press the `View push commands` to get the commands for tagging and pushing your image
@@ -60,9 +60,10 @@ Prefix that all of the resources created must have the following tags
         1. Launch type = `AWS Fargate`
         2. Add the previously created `task` and `task execution` roles
         3. Name the container `wordpress`
-        4. Attach your image from ECR
-        5. port mapping is `80`
-        6. Attach the following ENV-s to the task definition
+        4. Use the already created custom task and taskExecution IAM Roles for permissions
+        5. Attach your image from ECR
+        6. port mapping is `80`
+        7. Attach the following ENV-s to the task definition
 
             With `Parameter Store` just use the `ARN` of the parameter
 
