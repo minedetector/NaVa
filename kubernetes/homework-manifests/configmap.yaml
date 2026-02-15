@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: exercise-2-config
+  labels:
+    app: exercise-2
+data:
+  ENVIRONMENT: "development"
+  FEATURE_FLAG_DEMO: "true"
